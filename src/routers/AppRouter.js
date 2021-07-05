@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { HashRouter as Router, Redirect, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import { PublicRoute } from "./PublicRoute";
 import { Login } from "./../components/auth/Login";
 import { TicketForm } from "./../components/tickets/TicketForm";
 import { PrivateRoute } from "./PrivateRoute";
 import PersistentDrawerLeft from "../components/ui/Drawer";
-import { TableTickets } from "./../components/tickets/TableTickets";
 import { useDispatch, useSelector } from "react-redux";
 import { firebase } from "../firebase/firebaseConfig";
-import { login } from "../redux/actionCreators/auth";
+import { getRol } from "../redux/actionCreators/auth";
 import { Register } from "./../components/auth/Register";
 import { Ticket } from "../components/tickets/Ticket";
+import { MyTickets } from "./../components/tickets/MyTickets";
+import { TicketsAssigned } from "./../components/tickets/TicketsAssigned";
+import { AllTickets } from "./../components/tickets/AllTickets";
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
@@ -20,7 +22,8 @@ export const AppRouter = () => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
       if (user?.uid) {
-        dispatch(login(user.uid, user.displayName));
+        dispatch(getRol(user.uid));
+
         setIsLogged(true);
       } else {
         setIsLogged(false);
@@ -66,7 +69,7 @@ export const AppRouter = () => {
               isAuthenticathed={isLogged}
               exact
               path="/mytickets"
-              component={TableTickets}
+              component={MyTickets}
             />
             {rol !== "user" && (
               <>
@@ -74,13 +77,13 @@ export const AppRouter = () => {
                   isAuthenticathed={isLogged}
                   exact
                   path="/tickets"
-                  component={TableTickets}
+                  component={AllTickets}
                 />
                 <PrivateRoute
                   isAuthenticathed={isLogged}
                   exact
                   path="/tickets/assigned"
-                  component={TableTickets}
+                  component={TicketsAssigned}
                 />
               </>
             )}

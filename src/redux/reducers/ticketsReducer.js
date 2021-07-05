@@ -3,14 +3,18 @@ import { actionTypes } from "../actionTypes";
 export const ticketsReducer = (state = {}, { type, payload }) => {
   switch (type) {
     case actionTypes.getTickets:
-      return { ...state, data: payload };
+      return { data: payload };
     case actionTypes.getTicket:
-      return { ...state, messages: payload.messages, ticket: payload.ticket };
+      return {
+        messages: payload.messages,
+        ticket: payload.ticket,
+      };
     case actionTypes.getPesonal:
       return {
-        ...state,
         personal: payload,
       };
+    case actionTypes.ticketsRemove:
+      return {};
     default:
       return state;
   }

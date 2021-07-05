@@ -78,7 +78,7 @@ export const TicketForm = () => {
       classification,
       claimant: displayName,
       requested: new Date(),
-      status: "open",
+      status: "Abierto",
     };
     const message = {
       author: displayName,

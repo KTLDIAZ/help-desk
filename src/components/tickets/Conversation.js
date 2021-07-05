@@ -6,11 +6,15 @@ import {
   Paper,
   TextField,
   Button,
+  MenuItem,
 } from "@material-ui/core";
 import { Messages } from "./Messages";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { respondTicket } from "./../../redux/actionCreators/ticket";
+import {
+  respondTicket,
+  updateTicketStatus,
+} from "./../../redux/actionCreators/ticket";
 import SendIcon from "@material-ui/icons/Send";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,8 +41,23 @@ const useStyles = makeStyles((theme) => ({
   navlink: {
     textDecorationLine: "none",
   },
+  textField: {
+    marginTop: 10,
+    marginLeft: 10,
+  },
 }));
 
+const statuss = [
+  {
+    label: "Abierto",
+  },
+  {
+    label: "Pendiente",
+  },
+  {
+    label: "Cerrado",
+  },
+];
 export const Conversation = ({ subject }) => {
   const classes = useStyles();
 
@@ -56,9 +75,17 @@ export const Conversation = ({ subject }) => {
       author: displayName,
       date: new Date(),
     };
-    dispatch(respondTicket(id, payload));
+    if (message) dispatch(respondTicket(id, payload));
+    dispatch(updateTicketStatus(id, status));
   };
 
+  const [status, setStatus] = useState(ticket?.status);
+
+  const handleStatus = ({ target }) => {
+    setStatus(target.value);
+  };
+
+  console.log(status);
   return (
     <div className={classes.root}>
       <Paper elevation={8} square>
@@ -93,14 +120,38 @@ export const Conversation = ({ subject }) => {
                   },
                 }}
               />
-              <Button
-                variant="contained"
-                color="primary"
-                endIcon={<SendIcon></SendIcon>}
-                onClick={handleSubmit}
-              >
-                Enviar
-              </Button>
+              <Grid item xs={12}>
+                <Grid container>
+                  <Grid item xs={4}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Cambiar estado del ticket:"
+                      value={status}
+                      defaultValue={status}
+                      onChange={handleStatus}
+                    >
+                      {statuss &&
+                        statuss.map((s, index) => (
+                          <MenuItem value={s.label} key={index}>
+                            {s.label}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.textField}
+                      endIcon={<SendIcon></SendIcon>}
+                      onClick={handleSubmit}
+                    >
+                      Enviar
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </div>

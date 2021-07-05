@@ -15,7 +15,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import { useDispatch, useSelector } from "react-redux";
 import { startLogout } from "./../../redux/actionCreators/auth";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -138,29 +138,29 @@ export default function PersistentDrawerLeft({ children }) {
         </div>
         <Divider />
         <List>
-          <NavLink to="/" className={classes.navLink}>
+          <Link to="/" className={classes.navLink}>
             <ListItem button>
               <ListItemText primary={"Enviar tickets"} />
             </ListItem>
-          </NavLink>
-          <NavLink to="/mytickets" className={classes.navLink}>
+          </Link>
+          <Link to="/mytickets" className={classes.navLink}>
             <ListItem button>
               <ListItemText primary={"Mis tickets"} />
             </ListItem>
-          </NavLink>
+          </Link>
           {rol !== "user" && (
-            <NavLink to="/tickets" className={classes.navLink}>
+            <Link to="/tickets" className={classes.navLink}>
               <ListItem button>
                 <ListItemText primary={"Tickets"} />
               </ListItem>
-            </NavLink>
+            </Link>
           )}
           {rol !== "user" && "first_level" && (
-            <NavLink to="/tickets/asiggned" className={classes.navLink}>
+            <Link to="/tickets/assigned" className={classes.navLink}>
               <ListItem button>
                 <ListItemText primary={"Tickets asignados"} />
               </ListItem>
-            </NavLink>
+            </Link>
           )}
         </List>
         <Divider />

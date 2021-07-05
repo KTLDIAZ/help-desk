@@ -32,7 +32,9 @@ const useStyles = makeStyles((theme) => ({
 export const TicketPanel = () => {
   const classes = useStyles();
 
-  const { ticket } = useSelector((state) => state.tickets);
+  const { tickets, auth } = useSelector((state) => state);
+  const { rol } = auth;
+  const { ticket } = tickets;
   const { requested, subject, claimant, classification, priority, status } =
     !!ticket && ticket;
   return (
@@ -61,7 +63,7 @@ export const TicketPanel = () => {
                     ticket.assigned ? ticket.assigned : "Nadie"
                   }`}
                 </Typography>
-                <AssignedPersonal />
+                {rol !== "user" && <AssignedPersonal />}
               </Grid>
             )}
           </Grid>

@@ -7,5 +7,6 @@ export const actionTypes = {
   uiRemoveError: "[UI] REMOVE ERROR ",
   getTickets: "[TICKETS] GET TICKETS",
   getTicket: "[TICKET] GET TICKET",
+  ticketsRemove: "[TICKET] TICKETS REMOVE",
   getPesonal: "[TICKET] GET PERSONAL",
 };

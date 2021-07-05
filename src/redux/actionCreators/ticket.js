@@ -2,7 +2,6 @@ import { actionTypes } from "../actionTypes";
 import { db, firebase } from "../../firebase/firebaseConfig";
 import { finishLoading, startLoading } from "./ui";
 import moment from "moment";
-//import Swal from "sweetalert2";
 
 const ticketRef = db.collection("tickets");
 
@@ -18,9 +17,14 @@ export const createTicket = (ticket, message, photo) => {
           .add(message);
         return { docId: docRef.id, subDocId: subDocId.id };
       })
-      .then(({ docId, subDocId }) =>
-        dispatch(uploadPhoto(photo, docId, subDocId))
-      )
+      .then(({ docId, subDocId }) => {
+        if (photo) {
+          dispatch(uploadPhoto(photo, docId, subDocId));
+        } else {
+          dispatch(finishLoading());
+        }
+        window.location = `#/ticket/${docId}`;
+      })
       .catch((err) => console.log(err));
   };
 };
@@ -44,8 +48,9 @@ export const getTickets = (data) => ({
 });
 
 export const getTicketsSnapshot = () => {
-  return (dispatch) => {
-    ticketRef.onSnapshot((querySnapshot) => {
+  return async (dispatch) => {
+    await ticketRef.get((querySnapshot) => {
+      console.log("tickets");
       let tickets = [];
       querySnapshot.forEach((doc) => {
         let data = doc.data();
@@ -55,6 +60,7 @@ export const getTicketsSnapshot = () => {
           id: doc.id,
         });
       });
+      console.log(tickets);
       dispatch(getTickets(tickets));
     });
   };
@@ -67,33 +73,42 @@ export const getTicket = (messages, ticket) => ({
 
 export const getTicketSnapshot = (docId) => {
   return async (dispatch) => {
-    let response = await ticketRef.doc(docId).get();
-
-    let data = await db
-      .collection(`tickets/${docId}/messages`)
-      .orderBy("date", "asc")
-      .get();
-
-    let messages = [];
-    data.forEach((doc) => {
-      let docData = doc.data();
-      messages.push({
-        ...docData,
-        date: moment(docData.date.toDate()).calendar(),
-      });
+    let ticket;
+    ticketRef.doc(docId).onSnapshot((response) => {
+      ticket = response.data();
+      ticket = {
+        ...ticket,
+        requested: moment(ticket.requested.toDate()).calendar(),
+      };
     });
-    let ticket = response.data();
-    ticket = {
-      ...ticket,
-      requested: moment(ticket.requested.toDate()).calendar(),
-    };
-    dispatch(getTicket(messages, ticket));
+    let messages = [];
+
+    db.collection(`tickets/${docId}/messages`)
+      .orderBy("date", "asc")
+      .onSnapshot((data) => {
+        data.forEach((doc) => {
+          let docData = doc.data();
+          messages.push({
+            ...docData,
+            date: moment(docData.date.toDate()).calendar(),
+          });
+          dispatch(getTicket(messages, ticket));
+        });
+      });
   };
 };
 
 export const respondTicket = (docId, data) => {
   return async (dispatch) => {
     await db.collection(`tickets/${docId}/messages`).add(data);
+  };
+};
+
+export const updateTicketStatus = (docId, status) => {
+  return async () => {
+    await db.collection(`tickets`).doc(docId).update({
+      status,
+    });
   };
 };
 
@@ -135,6 +150,7 @@ export const getMyTickets = (uid) => {
       .where("uid", "==", uid)
       .get()
       .then((querySnapshot) => {
+        console.log("getmytickets");
         let tickets = [];
         querySnapshot.forEach((doc) => {
           let data = doc.data();
@@ -158,6 +174,7 @@ export const getTicketsAssigned = (assigned) => {
       .where("assigned", "==", assigned)
       .get()
       .then((querySnapshot) => {
+        console.log("assigned");
         let tickets = [];
         querySnapshot.forEach((doc) => {
           let data = doc.data();
@@ -174,3 +191,7 @@ export const getTicketsAssigned = (assigned) => {
       });
   };
 };
+
+export const ticketRemove = () => ({
+  type: actionTypes.ticketsRemove,
+});

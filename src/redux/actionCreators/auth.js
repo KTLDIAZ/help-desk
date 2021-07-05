@@ -1,7 +1,6 @@
 import { actionTypes } from "../actionTypes";
 import { firebase, db } from "../../firebase/firebaseConfig";
 import { finishLoading, startLoading } from "./ui";
-import Swal from "sweetalert2";
 
 export const login = (uid, displayName, rol) => ({
   type: actionTypes.login,
@@ -37,7 +36,6 @@ export const startLoginEmailPassword = (email, password) => {
       .catch((err) => {
         dispatch(finishLoading());
         console.log(err);
-        Swal.fire("Error", err.message, "error");
       });
   };
 };
@@ -74,3 +72,19 @@ export const startLogout = () => {
 export const logout = () => ({
   type: actionTypes.logout,
 });
+
+export const getRol = (uid) => {
+  return async (dispatch) => {
+    await db
+      .collection("users")
+      .doc(uid)
+      .get()
+      .then((user) => {
+        let { rol, name } = user.data();
+        dispatch(login(user.id, name, rol));
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+      });
+  };
+};

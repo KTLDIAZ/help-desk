@@ -1,13 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { forwardRef } from "react";
 import MaterialTable from "material-table";
 import { Grid } from "@material-ui/core";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getTicketsSnapshot,
-  getMyTickets,
-  getTicketsAssigned,
-} from "../../redux/actionCreators/ticket";
 import {
   AddBox,
   ArrowDownward,
@@ -25,6 +19,7 @@ import {
   Search,
   ViewColumn,
 } from "@material-ui/icons/";
+import { useHistory } from "react-router-dom";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -69,37 +64,23 @@ const columns = [
   },
 ];
 
-export const TableTickets = ({ history, location }) => {
-  const dispatch = useDispatch();
-
-  const { uid, displayName } = useSelector((state) => state.auth);
-
-  console.log(location.pathname);
-
-  useEffect(() => {
-    if (location.pathname === "/mytickets") {
-      dispatch(getMyTickets(uid));
-    } else if (location.pathname === "/tickets/assigned") {
-      dispatch(getTicketsAssigned(displayName));
-    } else {
-      dispatch(getTicketsSnapshot());
-    }
-  }, [dispatch, location.pathname, uid, displayName]);
-
-  const { data } = useSelector((state) => state.tickets);
+export const TableTickets = ({ data, tittle }) => {
+  const history = useHistory();
 
   return (
     <Grid>
-      <MaterialTable
-        title="Tickets"
-        icons={tableIcons}
-        columns={columns}
-        data={data}
-        onRowClick={(e, rowData) => history.push(`/ticket/${rowData.id}`)}
-        options={{
-          grouping: true,
-        }}
-      />
+      {data && (
+        <MaterialTable
+          title={tittle}
+          icons={tableIcons}
+          columns={columns}
+          data={data}
+          onRowClick={(e, rowData) => history.replace(`/ticket/${rowData.id}`)}
+          options={{
+            grouping: true,
+          }}
+        />
+      )}
     </Grid>
   );
 };
